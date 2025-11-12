@@ -1,0 +1,184 @@
+BLOCK:HttpRequest
+LABEL:LOGIN_REQUEST
+  url = "https://pocketoption.com/api/v1/login"
+  method = POST
+  customHeaders = {("Accept", "application/json, text/plain, */*"), ("Accept-Language", "en-US,en;q=0.9"), ("Content-Type", "application/json"), ("Origin", "https://pocketoption.com"), ("Referer", "https://pocketoption.com/login"), ("Sec-Fetch-Dest", "empty"), ("Sec-Fetch-Mode", "cors"), ("Sec-Fetch-Site", "same-origin"), ("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")}
+  TYPE:STANDARD
+  $"{\"email\":\"<input.USERNAME>\",\"password\":\"<input.PASSWORD>\"}"
+  "application/json"
+ENDBLOCK
+
+BLOCK:Keycheck
+LABEL:CHECK_LOGIN_RESPONSE
+    KEYCHAIN SUCCESS OR
+      STRINGKEY @data.SOURCE Contains "\"token\""
+      STRINGKEY @data.SOURCE Contains "\"access_token\""
+      STRINGKEY @data.SOURCE Contains "\"success\":true"
+      KEY @data.STATUSCODE Equals 200
+      STRINGKEY @data.SOURCE Contains "\"status\":\"success\""
+    KEYCHAIN FAIL OR
+      STRINGKEY @data.SOURCE Contains "\"error\""
+      STRINGKEY @data.SOURCE Contains "\"message\":\"Invalid"
+      STRINGKEY @data.SOURCE Contains "\"invalid\""
+      STRINGKEY @data.SOURCE Contains "\"incorrect\""
+      STRINGKEY @data.SOURCE Contains "\"unauthorized\""
+      STRINGKEY @data.SOURCE Contains "Invalid email or password"
+      KEY @data.STATUSCODE Equals 401
+      KEY @data.STATUSCODE Equals 403
+      KEY @data.STATUSCODE Equals 400
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:EXTRACT_TOKEN
+  input = @data.SOURCE
+  leftDelim = "\"token\":\""
+  rightDelim = "\""
+  MODE:LR
+  => VAR @TOKEN
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:EXTRACT_ACCESS_TOKEN
+  input = @data.SOURCE
+  leftDelim = "\"access_token\":\""
+  rightDelim = "\""
+  MODE:LR
+  => VAR @TOKEN
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:EXTRACT_REFRESH_TOKEN
+  input = @data.SOURCE
+  leftDelim = "\"refresh_token\":\""
+  rightDelim = "\""
+  MODE:LR
+  => VAR @REFRESH_TOKEN
+ENDBLOCK
+
+BLOCK:HttpRequest
+LABEL:GET_ACCOUNT_INFO
+  url = "https://pocketoption.com/api/v1/account"
+  method = GET
+  customHeaders = {("Accept", "application/json, text/plain, */*"), ("Accept-Language", "en-US,en;q=0.9"), ("Authorization", "Bearer <TOKEN>"), ("Origin", "https://pocketoption.com"), ("Referer", "https://pocketoption.com/"), ("Sec-Fetch-Dest", "empty"), ("Sec-Fetch-Mode", "cors"), ("Sec-Fetch-Site", "same-origin"), ("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")}
+  TYPE:STANDARD
+  $ ""
+  "application/json"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:EXTRACT_EMAIL
+  input = @data.SOURCE
+  leftDelim = "\"email\":\""
+  rightDelim = "\""
+  MODE:LR
+  => CAPTURE "Email"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:EXTRACT_BALANCE
+  input = @data.SOURCE
+  leftDelim = "\"balance\":"
+  rightDelim = ","
+  MODE:LR
+  => CAPTURE "Balance"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:EXTRACT_ACCOUNT_ID
+  input = @data.SOURCE
+  leftDelim = "\"id\":"
+  rightDelim = ","
+  MODE:LR
+  => CAPTURE "AccountID"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:EXTRACT_USERNAME
+  input = @data.SOURCE
+  leftDelim = "\"username\":\""
+  rightDelim = "\""
+  MODE:LR
+  => CAPTURE "Username"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:EXTRACT_FIRST_NAME
+  input = @data.SOURCE
+  leftDelim = "\"firstName\":\""
+  rightDelim = "\""
+  MODE:LR
+  => CAPTURE "FirstName"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:EXTRACT_LAST_NAME
+  input = @data.SOURCE
+  leftDelim = "\"lastName\":\""
+  rightDelim = "\""
+  MODE:LR
+  => CAPTURE "LastName"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:EXTRACT_PHONE
+  input = @data.SOURCE
+  leftDelim = "\"phone\":\""
+  rightDelim = "\""
+  MODE:LR
+  => CAPTURE "Phone"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:EXTRACT_COUNTRY
+  input = @data.SOURCE
+  leftDelim = "\"country\":\""
+  rightDelim = "\""
+  MODE:LR
+  => CAPTURE "Country"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:EXTRACT_CURRENCY
+  input = @data.SOURCE
+  leftDelim = "\"currency\":\""
+  rightDelim = "\""
+  MODE:LR
+  => CAPTURE "Currency"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:EXTRACT_VERIFIED
+  input = @data.SOURCE
+  leftDelim = "\"verified\":"
+  rightDelim = ","
+  MODE:LR
+  => CAPTURE "Verified"
+ENDBLOCK
+
+BLOCK:HttpRequest
+LABEL:GET_BALANCE_INFO
+  url = "https://pocketoption.com/api/v1/balance"
+  method = GET
+  customHeaders = {("Accept", "application/json, text/plain, */*"), ("Accept-Language", "en-US,en;q=0.9"), ("Authorization", "Bearer <TOKEN>"), ("Origin", "https://pocketoption.com"), ("Referer", "https://pocketoption.com/"), ("Sec-Fetch-Dest", "empty"), ("Sec-Fetch-Mode", "cors"), ("Sec-Fetch-Site", "same-origin"), ("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")}
+  TYPE:STANDARD
+  $ ""
+  "application/json"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:EXTRACT_AVAILABLE_BALANCE
+  input = @data.SOURCE
+  leftDelim = "\"available\":"
+  rightDelim = ","
+  MODE:LR
+  => CAPTURE "AvailableBalance"
+ENDBLOCK
+
+BLOCK:Parse
+LABEL:EXTRACT_BONUS_BALANCE
+  input = @data.SOURCE
+  leftDelim = "\"bonus\":"
+  rightDelim = ","
+  MODE:LR
+  => CAPTURE "BonusBalance"
+ENDBLOCK
